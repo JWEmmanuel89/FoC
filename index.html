@@ -43,6 +43,26 @@ and the potential of computing machines.</p>
 <footer>
   <p>@ Powered by UB</p>
 </footer>
+<script>
+      ### Step 1: Get Public IP Address
+GET https://api.ipify.org?format=json
+Accept: application/json
 
+### Step 2: Get Location based on IP
+# Using the result of the first API call to find the location
+GET https://ipapi.co/{{prev.response.body.$.ip}}/json
+Accept: application/json
+
+### Step 3: Get Weather by IP
+# Using the IP directly to get the weather
+GET https://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q={{prev.response.body.$.ip}}
+Accept: application/json
+
+### Step 4: Get Weather by Location
+# Using the location (latitude and longitude) from the previous response to get the weather
+GET https://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q={{prev.response.body.$.latitude}},{{prev.response.body.$.longitude}}
+Accept: application/json
+
+    </script>
 </body>
 </html>
