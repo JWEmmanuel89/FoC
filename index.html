@@ -19,16 +19,16 @@
     <ul>
       <li><h5><a href="index.html">Course</a></h5></li>
       <li><h5><a href="project.html">Project</a></h5></li>
-	  <li><h5><a href="concepts.html">Concepts</a></h5></li>
-	  <li><h5><a href="database.html">Databases</a></h5></li>
-	  <li><h5><a href="documentation.html">Documentation</a></h5></li>
+      <li><h5><a href="concepts.html">Concepts</a></h5></li>
+      <li><h5><a href="database.html">Databases</a></h5></li>
+      <li><h5><a href="documentation.html">Documentation</a></h5></li>
       <li><h5><a href="aboutme.html">Dev Team</a></h5></li>
     </ul>
   </nav>
   
   <article>
-   <center><img src="FoC5.png" alt="FoC"  width="570" height="365"></center>
-   <p></p>
+    <center><img src="FoC5.png" alt="FoC" width="570" height="365"></center>
+    <p></p>
 
     <p> This course is an introduction to the fundamentals of Computer Science
 that will provide students with a foundation for future courses in Computer
@@ -37,11 +37,59 @@ allow students to understand the capabilities of computer systems in terms
 of: the computer architecture; operating systems and computer networks;
 software and software development; data organization and visualization;
 and the potential of computing machines.</p>
-    </article>
+    
+    <!-- Button to Trigger API Calls -->
+    <button id="fetchData" class="btn btn-primary">Fetch Data</button>
+
+    <!-- Result Display -->
+    <div id="results" class="mt-3">
+      <p id="ipAddress"></p>
+      <p id="location"></p>
+      <p id="weatherByIP"></p>
+      <p id="weatherByLocation"></p>
+    </div>
+  </article>
 </section>
 
 <footer>
   <p>@ Powered by UB</p>
 </footer>
+
+<script>
+document.getElementById('fetchData').addEventListener('click', async () => {
+    const results = document.getElementById('results');
+    results.innerHTML = "Fetching data...";
+
+    try {
+        // 1. Get Public IP Address
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        const ipAddress = ipData.ip;
+        document.getElementById('ipAddress').innerText = `IP Address: ${ipAddress}`;
+
+        // 2. Get Location based on IP Address
+        const locationResponse = await fetch(`https://ipinfo.io/${ipAddress}?token=your_token_here`);
+        const locationData = await locationResponse.json();
+        const location = `${locationData.city}, ${locationData.region}, ${locationData.country}`;
+        document.getElementById('location').innerText = `Location: ${location}`;
+
+        // 3. Get Weather based on IP Address
+        const weatherIPResponse = await fetch(`https://api.weatherapi.com/v1/current.json?key=your_api_key&q=${ipAddress}`);
+        const weatherIPData = await weatherIPResponse.json();
+        const weatherByIP = `Weather (by IP): ${weatherIPData.current.condition.text}, ${weatherIPData.current.temp_c}°C`;
+        document.getElementById('weatherByIP').innerText = weatherByIP;
+
+        // 4. Get Weather based on Location
+        const weatherLocationResponse = await fetch(`https://api.weatherapi.com/v1/current.json?key=your_api_key&q=${locationData.city}`);
+        const weatherLocationData = await weatherLocationResponse.json();
+        const weatherByLocation = `Weather (by Location): ${weatherLocationData.current.condition.text}, ${weatherLocationData.current.temp_c}°C`;
+        document.getElementById('weatherByLocation').innerText = weatherByLocation;
+
+    } catch (error) {
+        results.innerHTML = `Error: ${error.message}`;
+    }
+});
+</script>
+
 </body>
 </html>
