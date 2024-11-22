@@ -43,5 +43,65 @@ and the potential of computing machines.</p>
 <footer>
   <p>@ Powered by UB</p>
 </footer>
+	<script>
+        // Replace this with your Weather API key
+        const WEATHER_API_KEY = 'YOUR_API_KEY';
+
+        async function fetchPublicIP() {
+            const response = await fetch('https://api64.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        }
+
+        async function fetchLocationByIP(ip) {
+            const response = await fetch(`https://ipapi.co/${ip}/json/`);
+            const data = await response.json();
+            return {
+                city: data.city,
+                region: data.region,
+                country: data.country,
+                latitude: data.latitude,
+                longitude: data.longitude
+            };
+        }
+
+        async function fetchWeatherByIP(ip) {
+            const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${WEATHER_API_KEY}&q=${ip}`);
+            const data = await response.json();
+            return data.current;
+        }
+
+        async function fetchWeatherByCoordinates(latitude, longitude) {
+            const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${WEATHER_API_KEY}&q=${latitude},${longitude}`);
+            const data = await response.json();
+            return data.current;
+        }
+
+        async function main() {
+            const resultsDiv = document.getElementById('results');
+
+            try {
+                // Step 1: Get public IP
+                const ip = await fetchPublicIP();
+                resultsDiv.innerHTML += `<p>Public IP: ${ip}</p>`;
+
+                // Step 2: Get location by IP
+                const location = await fetchLocationByIP(ip);
+                resultsDiv.innerHTML += `<p>Location: ${location.city}, ${location.region}, ${location.country}</p>`;
+
+                // Step 3: Get weather by IP
+                const weatherByIP = await fetchWeatherByIP(ip);
+                resultsDiv.innerHTML += `<p>Weather by IP: ${weatherByIP.temp_c}°C, ${weatherByIP.condition.text}</p>`;
+
+                // Step 4: Get weather by coordinates
+                const weatherByCoordinates = await fetchWeatherByCoordinates(location.latitude, location.longitude);
+                resultsDiv.innerHTML += `<p>Weather by Coordinates: ${weatherByCoordinates.temp_c}°C, ${weatherByCoordinates.condition.text}</p>`;
+            } catch (error) {
+                resultsDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        main();
+    </script>
 </body>
 </html>
