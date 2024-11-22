@@ -1,56 +1,42 @@
 async function loadLocation() {
-  try {
-    // Fetch IP address
-    const myIpAddress = await fetch("https://api.ipify.org?format=json");
-    if (!myIpAddress.ok) throw new Error("Failed to fetch IP address");
-    const ipAddress = await myIpAddress.json();
-    console.log("My IP Address is: ", ipAddress.ip);
+  const myIpAddress = await fetch("https://api.ipify.org?format=json");
+  
+  const ipAddress = await myIpAddress.json();
+  console.log("my IP Address is: ", ipAddress);
+  const response = await fetch("https://ip-geolocation-ipwhois-io.p.rapidapi.com/json/?ip="+ipAddress.ip, {
+	"method": "GET",
+	"headers": {
+		"x-rapidapi-host": "ip-geolocation-ipwhois-io.p.rapidapi.com",
+		"x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
+	}
+});
+  const location = await response.json();
 
-    // Fetch location details
-    const response = await fetch(
-      `https://ip-geolocation-ipwhois-io.p.rapidapi.com/json/?ip=${ipAddress.ip}`,
-      {
-        method: "GET",
-        headers: {
-          "x-rapidapi-host": "ip-geolocation-ipwhois-io.p.rapidapi.com",
-          "x-rapidapi-key": "YOUR_RAPIDAPI_KEY"
-        }
-      }
-    );
-    if (!response.ok) throw new Error("Failed to fetch location details");
-    const location = await response.json();
+ document.getElementById("city").innerHTML = location.city;
+ document.getElementById("country").innerHTML = location.country;  
+ document.getElementById("isp").innerHTML = location.isp;  
 
-    // Update location details in the DOM
-    if (location.city && location.country && location.isp) {
-      document.getElementById("city").innerHTML = location.city;
-      document.getElementById("country").innerHTML = location.country;
-      document.getElementById("isp").innerHTML = location.isp;
-    } else {
-      console.warn("Incomplete location details", location);
-    }
+  console.log(location); 
 
-    console.log(location);
 
-    // Fetch weather details using WeatherAPI
-    const weatherAPIKey = "YOUR_WEATHERAPI_KEY"; // Get from https://www.weatherapi.com/
-    const responseW = await fetch(
-      `https://api.weatherapi.com/v1/current.json?key=${weatherAPIKey}&q=${location.city}`
-    );
-    if (!responseW.ok) throw new Error("Failed to fetch weather details");
-    const weather = await responseW.json();
+  const responseW = await fetch("https://community-open-weather-map.p.rapidapi.com/find?q="+location.city+"&units=imperial", {
+	"method": "GET",
+	"headers": {
+		"x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
+		"x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
+	}
+});
 
-    // Update weather details in the DOM
-    if (weather && weather.current) {
-      document.getElementById("weather").innerHTML =
-        weather.current.condition.text;
-      console.log(weather.current.condition.text);
-    } else {
-      console.warn("No weather data available", weather);
-    }
-  } catch (error) {
-    console.error("Error:", error.message);
-  }
+  const weather = await responseW.json();
+
+ document.getElementById("weather").innerHTML = weather.list[0].weather[0].description;
+ 
+
+  console.log(weather.list[0].weather[0].main); 
+
 }
 
-// Call the function
+
+
+
 loadLocation();
