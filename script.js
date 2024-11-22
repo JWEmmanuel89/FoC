@@ -19,7 +19,6 @@ async function loadLocation() {
     );
     if (!response.ok) throw new Error("Failed to fetch location details");
     const location = await response.json();
-    console.log("My location is: "+ location);
 
     // Update location details in the DOM
     if (location.city && location.country && location.isp) {
