@@ -1,42 +1,69 @@
-async function loadLocation() {
-  const myIpAddress = await fetch("https://api.ipify.org?format=json");
-  
-  const ipAddress = await myIpAddress.json();
-  console.log("my IP Address is: ", ipAddress);
-  const response = await fetch("https://ip-geolocation-ipwhois-io.p.rapidapi.com/json/?ip="+ipAddress.ip, {
-	"method": "GET",
-	"headers": {
-		"x-rapidapi-host": "ip-geolocation-ipwhois-io.p.rapidapi.com",
-		"x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
-	}
+document.addEventListener('DOMContentLoaded', () => {
+    // Function to fetch public IP
+    async function getPublicIP() {
+        try {
+            const response = await fetch('https://api64.ipify.org?format=json');
+            const data = await response.json();
+            console.log('Public IP:', data.ip);
+            return data.ip;
+        } catch (error) {
+            console.error('Error fetching public IP:', error);
+        }
+    }
+
+    // Function to get location using IP
+    async function getLocation(ip) {
+        try {
+            const response = await fetch(`https://ipapi.co/${ip}/json/`);
+            const data = await response.json();
+            console.log('Location Data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching location data:', error);
+        }
+    }
+
+    // Function to get weather using IP
+    async function getWeatherByIP(ip) {
+        const apiKey = 'your_weather_api_key'; // Replace with your weather API key
+        try {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${ip}&appid=${apiKey}`);
+            const data = await response.json();
+            console.log('Weather Data by IP:', data);
+        } catch (error) {
+            console.error('Error fetching weather data by IP:', error);
+        }
+    }
+
+    // Function to get weather using location
+    async function getWeatherByLocation(location) {
+        const apiKey = 'your_weather_api_key'; // Replace with your weather API key
+        try {
+            const { latitude, longitude } = location;
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`);
+            const data = await response.json();
+            console.log('Weather Data by Location:', data);
+        } catch (error) {
+            console.error('Error fetching weather data by location:', error);
+        }
+    }
+
+    // Main function to orchestrate API calls
+    async function fetchDetails() {
+        const ip = await getPublicIP();
+        if (!ip) return;
+
+        const locationData = await getLocation(ip);
+        if (!locationData) return;
+
+        await getWeatherByIP(ip);
+
+        if (locationData.latitude && locationData.longitude) {
+            await getWeatherByLocation(locationData);
+        } else {
+            console.error('Location coordinates missing.');
+        }
+    }
+
+    fetchDetails();
 });
-  const location = await response.json();
-
- document.getElementById("city").innerHTML = location.city;
- document.getElementById("country").innerHTML = location.country;  
- document.getElementById("isp").innerHTML = location.isp;  
-
-  console.log(location); 
-
-
-  const responseW = await fetch("https://community-open-weather-map.p.rapidapi.com/find?q="+location.city+"&units=imperial", {
-	"method": "GET",
-	"headers": {
-		"x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
-		"x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
-	}
-});
-
-  const weather = await responseW.json();
-
- document.getElementById("weather").innerHTML = weather.list[0].weather[0].description;
- 
-
-  console.log(weather.list[0].weather[0].main); 
-
-}
-
-
-
-
-loadLocation();
