@@ -43,35 +43,5 @@ and the potential of computing machines.</p>
 <footer>
   <p>@ Powered by UB</p>
 </footer>
-<script>
-	(async () => {
-  try {
-    // Step 1: Get your public IP address
-    const ipResponse = await fetch('https://api.ipify.org?format=json');
-    const ipData = await ipResponse.json();
-    const publicIP = ipData.ip;
-    console.log('Public IP:', publicIP);
-
-    // Step 2: Use the IP address to get your location
-    const locationResponse = await fetch(`https://api.ipstack.com/${publicIP}?access_key=YOUR_ACCESS_KEY`);
-    const locationData = await locationResponse.json();
-    const { city, country_name, latitude, longitude } = locationData;
-    console.log('Location:', { city, country_name, latitude, longitude });
-
-    // Step 3: Use the IP address to find the weather
-    const weatherByIPResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY`);
-    const weatherByIPData = await weatherByIPResponse.json();
-    console.log('Weather by IP:', weatherByIPData);
-
-    // Step 4: Use the location (city) to find the weather again
-    const weatherByLocationResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY`);
-    const weatherByLocationData = await weatherByLocationResponse.json();
-    console.log('Weather by Location:', weatherByLocationData);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-})();
-
-</script>
 </body>
 </html>
