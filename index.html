@@ -53,7 +53,7 @@ and the potential of computing machines.</p>
     console.log('Public IP:', publicIP);
 
     // Step 2: Use the IP address to get your location
-    const locationResponse = await fetch(`http://api.ipstack.com/${publicIP}?access_key=YOUR_ACCESS_KEY`);
+    const locationResponse = await fetch(`https://api.ipstack.com/${publicIP}?access_key=YOUR_ACCESS_KEY`);
     const locationData = await locationResponse.json();
     const { city, country_name, latitude, longitude } = locationData;
     console.log('Location:', { city, country_name, latitude, longitude });
