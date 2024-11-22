@@ -1,60 +1,70 @@
-async function loadLocation() {
-  try {
-    // Fetch IP address
-    const myIpAddress = await fetch("https://api.ipify.org?format=json");
-    if (!myIpAddress.ok) throw new Error("Failed to fetch IP address");
-    const ipAddress = await myIpAddress.json();
-    console.log("My IP Address is: ", ipAddress.ip);
+document.addEventListener('DOMContentLoaded', () => {
+    const IP_API = "https://api.ipify.org?format=json"; // Public IP API
+    const LOCATION_API = "https://ipinfo.io/"; // Location API
+    const WEATHER_API = "https://api.openweathermap.org/data/2.5/weather"; // Weather API
+    const WEATHER_API_KEY = "your_openweather_api_key"; // Replace with your OpenWeather API key
 
-    // Fetch location details
-    const response = await fetch(
-      `https://ip-geolocation-ipwhois-io.p.rapidapi.com/json/?ip=${ipAddress.ip}`,
-      {
-        method: "GET",
-        headers: {
-          "x-rapidapi-host": "ip-geolocation-ipwhois-io.p.rapidapi.com",
-          "x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
+    async function getPublicIP() {
+        try {
+            const response = await fetch(IP_API);
+            const data = await response.json();
+            return data.ip; // Return the public IP address
+        } catch (error) {
+            console.error("Error fetching public IP:", error);
         }
-      }
-    );
-    if (!response.ok) throw new Error("Failed to fetch location details");
-    const location = await response.json();
-
-    // Update location details in the DOM
-    if (location.city && location.country && location.isp) {
-      document.getElementById("city").innerHTML = location.city;
-      document.getElementById("country").innerHTML = location.country;
-      document.getElementById("isp").innerHTML = location.isp;
-    } else {
-      console.warn("Incomplete location details", location);
     }
 
-    console.log(location);
-
-    // Fetch weather details
-    const responseW = await fetch(
-      `https://community-open-weather-map.p.rapidapi.com/find?q=${location.city}&units=imperial`,
-      {
-        method: "GET",
-        headers: {
-          "x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
-          "x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
+    async function getLocation(ip) {
+        try {
+            const response = await fetch(`${LOCATION_API}${ip}/json`);
+            const data = await response.json();
+            return {
+                city: data.city,
+                region: data.region,
+                country: data.country,
+                coordinates: data.loc // Latitude and longitude
+            };
+        } catch (error) {
+            console.error("Error fetching location:", error);
         }
-      }
-    );
-    if (!responseW.ok) throw new Error("Failed to fetch weather details");
-    const weather = await responseW.json();
-
-    // Update weather details in the DOM
-       weather.list[0].weather[0].description;
-      console.log(weather.list[0].weather[0].main);
-    } else {
-      console.warn("No weather data available", weather);
     }
-  } catch (error) {
-    console.error("Error:", error.message);
-  }
-}
 
-// Call the function
-loadLocation();
+    async function getWeatherByIP(ip) {
+        try {
+            const response = await fetch(`${WEATHER_API}?q=${ip}&appid=${WEATHER_API_KEY}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error fetching weather by IP:", error);
+        }
+    }
+
+    async function getWeatherByLocation(location) {
+        try {
+            const [latitude, longitude] = location.coordinates.split(",");
+            const response = await fetch(
+                `${WEATHER_API}?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`
+            );
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error fetching weather by location:", error);
+        }
+    }
+
+    async function main() {
+        const ip = await getPublicIP();
+        console.log("Public IP:", ip);
+
+        const location = await getLocation(ip);
+        console.log("Location Info:", location);
+
+        const weatherByIP = await getWeatherByIP(ip);
+        console.log("Weather by IP:", weatherByIP);
+
+        const weatherByLocation = await getWeatherByLocation(location);
+        console.log("Weather by Location:", weatherByLocation);
+    }
+
+    main();
+});
