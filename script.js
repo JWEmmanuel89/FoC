@@ -13,7 +13,7 @@ async function loadLocation() {
         method: "GET",
         headers: {
           "x-rapidapi-host": "ip-geolocation-ipwhois-io.p.rapidapi.com",
-          "x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
+          "x-rapidapi-key": "YOUR_RAPIDAPI_KEY"
         }
       }
     );
@@ -31,25 +31,19 @@ async function loadLocation() {
 
     console.log(location);
 
-    // Fetch weather details
+    // Fetch weather details using WeatherAPI
+    const weatherAPIKey = "YOUR_WEATHERAPI_KEY"; // Get from https://www.weatherapi.com/
     const responseW = await fetch(
-      `https://community-open-weather-map.p.rapidapi.com/find?q=${location.city}&units=imperial`,
-      {
-        method: "GET",
-        headers: {
-          "x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
-          "x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
-        }
-      }
+      `https://api.weatherapi.com/v1/current.json?key=${weatherAPIKey}&q=${location.city}`
     );
     if (!responseW.ok) throw new Error("Failed to fetch weather details");
     const weather = await responseW.json();
 
     // Update weather details in the DOM
-    if (weather.list && weather.list.length > 0) {
+    if (weather && weather.current) {
       document.getElementById("weather").innerHTML =
-        weather.list[0].weather[0].description;
-      console.log(weather.list[0].weather[0].main);
+        weather.current.condition.text;
+      console.log(weather.current.condition.text);
     } else {
       console.warn("No weather data available", weather);
     }
