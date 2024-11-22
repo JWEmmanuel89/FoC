@@ -46,9 +46,7 @@ async function loadLocation() {
     const weather = await responseW.json();
 
     // Update weather details in the DOM
-    if (weather.list && weather.list.length > 0) {
-      document.getElementById("weather").innerHTML =
-        weather.list[0].weather[0].description;
+       weather.list[0].weather[0].description;
       console.log(weather.list[0].weather[0].main);
     } else {
       console.warn("No weather data available", weather);
